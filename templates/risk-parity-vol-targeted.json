@@ -1,0 +1,68 @@
+{
+  "name": "Example - Vol-Targeted Risk Parity Across Asset Classes",
+  "hypothesis": "Allocating across equity, bonds, gold, real estate and international equity in inverse-volatility proportion delivers a better risk-adjusted return than equal weighting, because asset-class volatilities differ persistently and are only weakly correlated.",
+  "_note": "Demonstrates vol_target sizing in the portfolio block. 'signal' here is a constant-on (only hold assets) and the sizing layer does the real work.",
+  "universe": {
+    "preset": "risk_parity_ish",
+    "symbols": []
+  },
+  "period": {
+    "start": "2008-01-01",
+    "end": null,
+    "interval": "1d"
+  },
+  "screen": {
+    "min_adv_usd": 0
+  },
+  "features": [
+    {
+      "name": "volatility",
+      "params": {
+        "lookback": 60,
+        "annualize": true
+      }
+    }
+  ],
+  "signal": {
+    "type": "time_series_threshold",
+    "params": {
+      "threshold": 0.0
+    }
+  },
+  "portfolio": {
+    "gross_leverage": 1.0,
+    "rebalance": "monthly",
+    "max_position": 0.35,
+    "vol_target": 0.12,
+    "vol_lookback": 60,
+    "long_only": true
+  },
+  "execution": {
+    "fill_at": "open",
+    "cost_multiplier": 1.0,
+    "max_participation": 0.1
+  },
+  "capital": 100000.0,
+  "intake": {
+    "confirmed": [
+      "hypothesis",
+      "universe",
+      "direction",
+      "entry",
+      "exit",
+      "timeframe",
+      "rebalance",
+      "sizing",
+      "leverage",
+      "costs",
+      "period",
+      "variants_tried"
+    ],
+    "variants_tried": 1,
+    "notes": "Illustrative template. Replace every value with the user's own answers before running. These conditions deliberately match the engine's default value (rebalance, costs), so they are recorded in accepted_defaults. They are still the USER's answers, not the engine's - but if you keep any of them, say so deliberately rather than by omission.",
+    "accepted_defaults": [
+      "rebalance",
+      "costs"
+    ]
+  }
+}

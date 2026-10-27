@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "strategy-backtest-lab"
+version = "1.0.0"
+description = "Dependency-free, stdlib-only backtesting engine that returns a blunt verdict on a trading hypothesis."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+# Replace with the owning project's name and contact before publishing.
+authors = [{ name = "strategy-backtest-lab contributors" }]
+keywords = ["backtesting", "trading", "quant", "validation", "strategy"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Office/Business :: Financial :: Investment",
+]
+# ZERO runtime dependencies. The engine is pure Python standard library so it
+# installs on a disk-constrained machine without pulling numpy/pandas/yfinance.
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/OWNER/strategy-backtest-lab"
+Issues = "https://github.com/OWNER/strategy-backtest-lab/issues"
+
+# The flat scripts/ layout is exposed as a single importable package.
+#
+# package-dir maps the `btlab` package onto the scripts/ directory, so every
+# module in scripts/ (btengine, btvalidate, disclosure, intake, intraday,
+# run_backtest, the selftests) is installed as `btlab.<module>`. The console
+# script below therefore points at `btlab.run_backtest:main` -- the dotted path
+# must match the installed module layout, not the on-disk filename.
+#
+# NOTE: the modules import each other with flat top-level names
+# (`from btengine import ...`), and each script puts its own directory on
+# sys.path, so they also run correctly as plain scripts from a checkout
+# (`python scripts/run_backtest.py`). That is the primary usage; the installed
+# `btlab` console script is a convenience wrapper. Modules that import a
+# sibling use a dual import (flat first, relative as the fallback) so they
+# also import from the installed package layout -- `scripts/selftest_packaging.py`
+# enforces that.
+[project.scripts]
+btlab = "btlab.run_backtest:main"
+
+[tool.setuptools]
+packages = ["btlab"]
+license-files = ["LICENSE"]
+
+[tool.setuptools.package-dir]
+btlab = "scripts"

@@ -1,0 +1,66 @@
+{
+  "name": "Example - Cross-Asset Class Trend Following",
+  "hypothesis": "Assets in a positive long-term trend persist across asset classes (equity, bonds, gold, commodities, international equity and crypto), reflecting slow-moving capital and herding that unwinds slowly.",
+  "_note": "Demonstrates a MULTI-ASSET COMBINATION: one signal applied across six different classes. Cross-class replication of an edge is the strongest evidence the lab can produce.",
+  "universe": {
+    "preset": "multi_asset",
+    "symbols": []
+  },
+  "period": {
+    "start": "2014-01-01",
+    "end": null,
+    "interval": "1d"
+  },
+  "screen": {
+    "min_adv_usd": 0
+  },
+  "features": [
+    {
+      "name": "sma_gap",
+      "params": {
+        "lookback": 200
+      }
+    }
+  ],
+  "signal": {
+    "type": "time_series_threshold",
+    "params": {
+      "threshold": 0.0
+    }
+  },
+  "portfolio": {
+    "gross_leverage": 1.0,
+    "rebalance": "monthly",
+    "max_position": 0.2,
+    "long_only": false
+  },
+  "execution": {
+    "fill_at": "open",
+    "cost_multiplier": 1.0,
+    "max_participation": 0.1
+  },
+  "capital": 100000.0,
+  "intake": {
+    "confirmed": [
+      "hypothesis",
+      "universe",
+      "direction",
+      "entry",
+      "exit",
+      "timeframe",
+      "rebalance",
+      "sizing",
+      "leverage",
+      "costs",
+      "period",
+      "variants_tried"
+    ],
+    "variants_tried": 1,
+    "notes": "Illustrative template. Replace every value with the user's own answers before running. These conditions deliberately match the engine's default value (direction, rebalance, costs), so they are recorded in accepted_defaults. They are still the USER's answers, not the engine's - but if you keep any of them, say so deliberately rather than by omission.",
+    "accepted_defaults": [
+      "direction",
+      "rebalance",
+      "costs"
+    ]
+  }
+}

@@ -1,0 +1,111 @@
+name: CI
+
+# Run on every push and every pull request.
+on:
+  push:
+  pull_request:
+
+# Cancel superseded runs on the same ref - a stale run on an old commit tells
+# you nothing about the code you are about to merge.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # The Windows job matters: the primary maintainer runs on Windows and
+        # the session-bar extraction is timezone-sensitive (bars are anchored
+        # to exchange-local time, and the session boundary is detected by
+        # grouping on the UTC calendar date). A naive implementation that
+        # passes on UTC-based CI runners can still be wrong on a machine in a
+        # non-UTC timezone, so Windows is a required part of the matrix.
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.11", "3.9"]
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install the package
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+
+      # ------------------------------------------------------------------
+      # The self-test suites.
+      #
+      # All four are run from the scripts/ directory, and the working
+      # directory is set explicitly because scripts/selftest.py reads the
+      # spec templates via the relative path ../templates/*.json.
+      #
+      # NETWORK: scripts/selftest.py backtests real strategies, so on a cold
+      # cache it needs to fetch market data from the Yahoo Finance chart API.
+      # The other three suites are fully offline and synthetic.
+      #
+      # If the network is unavailable, selftest.py fails at the data-fetch
+      # step and the job fails. That is accepted: a suite that silently
+      # skipped its own negative controls would be worth less than a red
+      # build. Subsequent runs on a warm cache need no network.
+      # ------------------------------------------------------------------
+      - name: Run selftest.py (behavioural controls, causality, invariants)
+        working-directory: scripts
+        run: python selftest.py
+
+      - name: Run selftest_intraday.py (offline session-path checks)
+        working-directory: scripts
+        run: python selftest_intraday.py
+
+      - name: Run selftest_corporate_actions.py (offline adjustment + cache checks)
+        working-directory: scripts
+        run: python selftest_corporate_actions.py
+
+      - name: Run selftest_packaging.py (offline packaged-layout import checks)
+        working-directory: scripts
+        run: python selftest_packaging.py
+
+      # ------------------------------------------------------------------
+      # CLI smoke test: the two commands that must work on a fresh checkout
+      # without touching the network.
+      # ------------------------------------------------------------------
+      - name: Smoke test the CLI (--list-presets)
+        working-directory: scripts
+        run: python run_backtest.py --list-presets
+
+      - name: Smoke test the CLI (--disclose)
+        working-directory: scripts
+        run: python run_backtest.py --disclose
+
+      # The console entry point installed by `pip install -e .` must resolve
+      # and run. This catches a pyproject.toml whose [project.scripts] target
+      # does not match the installed module layout.
+      - name: Smoke test the installed console entry point
+        working-directory: scripts
+        run: btlab --list-presets
+
+      # ------------------------------------------------------------------
+      # Byte-compile every module so a syntax error cannot reach a release
+      # on an interpreter version the matrix does not cover.
+      # ------------------------------------------------------------------
+      - name: Byte-compile all modules
+        working-directory: scripts
+        run: python -m compileall -q .
+
+      - name: Upload the market-data cache on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: market-data-cache-${{ matrix.os }}-py${{ matrix.python-version }}
+          path: .cache/
+          retention-days: 7
+          if-no-files-found: ignore

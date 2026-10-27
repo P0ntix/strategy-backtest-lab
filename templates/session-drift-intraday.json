@@ -1,0 +1,110 @@
+{
+  "name": "Session Drift Continuation (intraday, opening window)",
+  "hypothesis": "Institutional orders get worked over multiple days, so yesterday's net buying or selling pressure persists into today's open. A session that closed near the high of the opening window on heavy volume (net drift) predicts the same direction in the next session's opening window.",
+  "_intake_answers": {
+    "hypothesis": "Institutional orders get worked over multiple days, so yesterday's flow persists into today's open. (User selected this mechanism explicitly from the offered options.)",
+    "universe": "Equities (US ETFs, sectors, international) narrowed by the user to Broad ETFs only: SPY/VTI/IVV/RSP = the us_equity_broad preset.",
+    "direction": "Long and short (directional).",
+    "entry": "Previous session's net drift = where it closed within its range, times volume.",
+    "exit": "Flat at the 10:00 close of the window - no overnight risk.",
+    "timeframe": "Just the previous session (1 day).",
+    "rebalance": "Every session (daily). Derived from the user's own statement that the strategy 'only trades on the open of the new york session 9:30 to 10:00'.",
+    "sizing": "Inverse-volatility (each position contributes equal risk).",
+    "leverage": "Gross 1.0x, max 10% per instrument.",
+    "costs": "Same as daily-bar defaults, no adjustment.",
+    "period": "DATA-CONSTRAINED. The user was informed that Yahoo 60m history is capped at roughly 2 years, so only one window exists. Pinned to the first available session (2024-10-24) and run to the last (2026-10-23). Recorded as a finding rather than asked as a choice.",
+    "variants_tried": "1 - the user stated they did not really tune it."
+  },
+  "universe": {
+    "preset": "us_equity_broad",
+    "symbols": []
+  },
+  "period": {
+    "start": "2024-10-24",
+    "end": null,
+    "interval": "60m"
+  },
+  "screen": {
+    "min_adv_usd": 0
+  },
+  "features": [
+    {
+      "name": "session_drift",
+      "params": {
+        "lookback": 1
+      }
+    },
+    {
+      "name": "volatility",
+      "params": {
+        "lookback": 20,
+        "annualize": true
+      }
+    }
+  ],
+  "signal": {
+    "type": "cross_sectional",
+    "params": {
+      "long_rank": 0.75,
+      "short_rank": 0.25
+    }
+  },
+  "portfolio": {
+    "gross_leverage": 1.0,
+    "max_position": 0.1,
+    "vol_target": 0.15,
+    "vol_lookback": 20,
+    "rebalance": "daily",
+    "long_only": false
+  },
+  "execution": {
+    "mode": "session",
+    "window": "first",
+    "fill_at": "open",
+    "flat_at_close": true,
+    "cost_multiplier": 1.0,
+    "max_participation": 0.1
+  },
+  "capital": 100000.0,
+  "intake": {
+    "confirmed": [
+      "hypothesis",
+      "universe",
+      "direction",
+      "entry",
+      "exit",
+      "timeframe",
+      "rebalance",
+      "sizing",
+      "leverage",
+      "costs",
+      "period",
+      "variants_tried"
+    ],
+    "variants_tried": 1,
+    "notes": "All 12 conditions supplied by the user via the intake questionnaire. Limitations carried into the report: (1) gamma exposure and order-flow data are NOT available in this engine, so the hypothesis is tested through its net-drift component only - the mechanism the user named (worked institutional orders) is proxied by close-location-in-range x volume; (2) only about 2 years of 60m history exists, capping statistical power; (3) 4 instruments with a 10% cap and a quartile split yields at most 1 long + 1 short, so realised gross is 0.2x, not the stated 1.0x; (4) intraday costs use daily-bar cost defaults at the user's request, which is likely optimistic for an opening-window strategy. These conditions deliberately match the engine's default value (universe, direction, entry, costs), so they are recorded in accepted_defaults. They are still the USER's answers, not the engine's - but if you keep any of them, say so deliberately rather than by omission.",
+    "answers": {
+      "A.asset_classes": "IN SCOPE: US broad ETFs only (SPY/VTI/IVV/RSP), long and short. EXCLUDED: FX, crypto, futures, bonds/credit, commodities, options, individual stocks, international equity. The user narrowed a broader 'equities' scope down to broad ETFs.",
+      "A.rationale": "Single asset class in scope, so no cross-class combination rationale applies. Signal rationale: institutional orders get worked over multiple days, so yesterday's net flow persists into today's open.",
+      "A.universe_rules": "Static list of 4 broad ETFs. NOT point-in-time. ETFs sidestep the delisting survivorship bias that individual equities would carry, which is why they were selected.",
+      "A.rebalance_horizon": "Every session (daily). Signal horizon: the previous session only (1 day). Holding period: one opening window (09:30-10:00 ET), flat by the close.",
+      "A.allocation": "Inverse-volatility sizing (equal risk contribution) within the 4-instrument universe, normalised to gross 1.0x, then capped at 10% per instrument. VERIFIED FINDING: the 10% cap binds on every single bar, so every realised weight is exactly +/-0.10 and the inverse-vol sizing is COMPLETELY INERT - it cannot affect the result. The user's stated sizing method was not actually exercised.",
+      "A.constraints": "Gross 1.0x target, max 10% per instrument. VERIFIED FINDING: with 4 instruments and a top/bottom-quartile split (1 long + 1 short), the 10% cap binds every bar, so realised gross is 0.2x, not the stated 1.0x. Sharpe is leverage-invariant so the verdict is unaffected, but the CAGR and drawdown reported are 5x smaller than a 1.0x book would show. Consequence: the inverse-volatility sizing the user specified never took effect.",
+      "A.direction": "Long and short (directional). Top quartile long, bottom quartile short.",
+      "A.discretionary_overrides": "None stated by the user.",
+      "G.variants_tested": "1 - the user stated they did not really tune it.",
+      "A.rejection_criteria": "NOT SPECIFIED BY THE USER - recorded as UNKNOWN. Pre-registered rejection criteria were never set, which weakens the falsifiability of this test.",
+      "A.benchmark": "NOT SPECIFIED BY THE USER - UNKNOWN. No investable benchmark was named, so performance is measured against zero net-of-cost expectancy instead of against an investable alternative.",
+      "A.null_hypothesis": "Zero net-of-cost expectancy, and no marginal diversification benefit from any asset class. NOTE: the second half is NOT tested - the engine does not perform leave-one-asset-out.",
+      "E.commissions": "Same as the engine's daily-bar cost defaults, no adjustment (the user's explicit choice). Flagged in the report as likely optimistic for an opening-window strategy, where spreads are typically wider.",
+      "D.asset_selection": "The user narrowed the universe from all US equities to broad ETFs BEFORE the test was run, and no asset class was added or removed after seeing results.",
+      "I.forward_test_type": "Not yet started. The engine is retrospective only; forward testing is a separate manual process."
+    },
+    "accepted_defaults": [
+      "universe",
+      "direction",
+      "entry",
+      "costs"
+    ]
+  }
+}

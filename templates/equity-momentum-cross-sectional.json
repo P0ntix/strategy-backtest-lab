@@ -1,0 +1,69 @@
+{
+  "name": "Example - 12-1 Month Cross-Sectional Momentum",
+  "hypothesis": "Sectors that outperformed over the past 12 months (skipping the last month) continue to outperform over the next month, driven by slow-moving institutional flows and underreaction to persistent trends.",
+  "universe": {
+    "preset": "us_equity_sector",
+    "symbols": []
+  },
+  "period": {
+    "start": "2010-01-01",
+    "end": null,
+    "interval": "1d"
+  },
+  "screen": {
+    "min_adv_usd": 0
+  },
+  "features": [
+    {
+      "name": "momentum",
+      "params": {
+        "lookback": 252,
+        "skip": 21
+      }
+    }
+  ],
+  "signal": {
+    "type": "cross_sectional",
+    "params": {
+      "long_rank": 0.75,
+      "short_rank": 0.25
+    }
+  },
+  "portfolio": {
+    "gross_leverage": 1.0,
+    "rebalance": "monthly",
+    "long_only": true,
+    "max_position": 0.2
+  },
+  "execution": {
+    "fill_at": "open",
+    "cost_multiplier": 1.0,
+    "max_participation": 0.1
+  },
+  "capital": 100000.0,
+  "intake": {
+    "confirmed": [
+      "hypothesis",
+      "universe",
+      "direction",
+      "entry",
+      "exit",
+      "timeframe",
+      "rebalance",
+      "sizing",
+      "leverage",
+      "costs",
+      "period",
+      "variants_tried"
+    ],
+    "variants_tried": 1,
+    "notes": "Illustrative template. Replace every value with the user's own answers before running. These conditions deliberately match the engine's default value (entry, exit, timeframe, rebalance, costs), so they are recorded in accepted_defaults. They are still the USER's answers, not the engine's - but if you keep any of them, say so deliberately rather than by omission.",
+    "accepted_defaults": [
+      "entry",
+      "exit",
+      "timeframe",
+      "rebalance",
+      "costs"
+    ]
+  }
+}

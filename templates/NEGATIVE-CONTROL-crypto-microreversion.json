@@ -1,0 +1,65 @@
+{
+  "name": "Example - Crypto Micro-Reversion (EXPECTED TO FAIL)",
+  "hypothesis": "Cryptocurrencies that fall more than 1% in a day bounce within that same day.",
+  "_note": "This is a DELIBERATE NEGATIVE CONTROL. Run it to see what a REFUTED verdict looks like: the edge is smaller than crypto taker fees and dies at 2x cost stress. Do not report this as a tradeable idea.",
+  "universe": {
+    "preset": "crypto",
+    "symbols": []
+  },
+  "period": {
+    "start": "2018-01-01",
+    "end": null,
+    "interval": "1d"
+  },
+  "screen": {
+    "min_adv_usd": 0
+  },
+  "features": [
+    {
+      "name": "return",
+      "params": {
+        "lag": 1
+      }
+    }
+  ],
+  "signal": {
+    "type": "time_series_threshold",
+    "params": {
+      "threshold": -0.01
+    }
+  },
+  "portfolio": {
+    "gross_leverage": 1.0,
+    "rebalance": "daily",
+    "max_position": 0.15,
+    "long_only": false
+  },
+  "execution": {
+    "fill_at": "open",
+    "cost_multiplier": 1.0,
+    "max_participation": 0.1
+  },
+  "capital": 100000.0,
+  "intake": {
+    "confirmed": [
+      "hypothesis",
+      "universe",
+      "direction",
+      "entry",
+      "exit",
+      "timeframe",
+      "rebalance",
+      "sizing",
+      "leverage",
+      "costs",
+      "period",
+      "variants_tried"
+    ],
+    "variants_tried": 1,
+    "notes": "Deliberate negative control. Its intake block is pre-confirmed so the lab can self-test; a real strategy must carry the user's own answers. These conditions deliberately match the engine's default value (direction, costs), so they are recorded in accepted_defaults. They are still the USER's answers, not the engine's - but if you keep any of them, say so deliberately rather than by omission.",
+    "accepted_defaults": [
+      "direction",
+      "costs"
+    ]
+  }
+}

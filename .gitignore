@@ -1,0 +1,71 @@
+# ---------------------------------------------------------------------------
+# Market-data cache. The engine caches every fetched symbol as JSON in
+# .cache/ next to the scripts. This directory grows to tens of megabytes and
+# is fully regenerable -- never commit it.
+# ---------------------------------------------------------------------------
+.cache/
+*.json.cache
+
+# ---------------------------------------------------------------------------
+# Python bytecode / build artefacts
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+build/
+dist/
+sdist/
+wheels/
+*.egg-info/
+*.egg
+.eggs/
+pip-wheel-metadata/
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# ---------------------------------------------------------------------------
+# Generated backtest reports. The CLI writes `<strategy_name>_report.md` into
+# the current working directory by default. These are per-run evidence
+# artefacts, not source.
+# ---------------------------------------------------------------------------
+*_report.md
+*_reports.md
+report.md
+
+# ---------------------------------------------------------------------------
+# Test / coverage / tooling caches
+# ---------------------------------------------------------------------------
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# ---------------------------------------------------------------------------
+# Editor and OS cruft
+# ---------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
